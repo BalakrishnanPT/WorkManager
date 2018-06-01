@@ -34,6 +34,11 @@ final class WorkerUtils {
     private WorkerUtils() {
     }
 
+    /**
+     * creating Notification Method
+     * @param message String for notification
+     * @param context Context (Application Context is enough)
+     */
     static void makeStatusNotification(String message, Context context) {
 
         // Make a channel if necessary
@@ -68,6 +73,9 @@ final class WorkerUtils {
         NotificationManagerCompat.from(context).notify(Constants.NOTIFICATION_ID++, builder.build());
     }
 
+    /**
+     * Method to produce Manual delay
+     */
     static void sleep() {
         try {
             Thread.sleep(DELAY_TIME_MILLIS, 0);

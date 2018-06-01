@@ -14,7 +14,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text=" Cancel One Time Request"
+        android:text="Cancel Periodic Request"
         app:layout_constraintBottom_toTopOf="@+id/cancelcontinuationRequest"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="One Time Request"
+        android:text="Periodic Request"
         app:layout_constraintBottom_toTopOf="@+id/continuationRequest"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

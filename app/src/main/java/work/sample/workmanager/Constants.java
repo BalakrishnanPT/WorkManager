@@ -25,11 +25,13 @@ public final class Constants {
             "Verbose WorkManager Notifications";
     public static final CharSequence NOTIFICATION_TITLE = "WorkRequest Starting";
     public static final String CHANNEL_ID = "VERBOSE_NOTIFICATION";
+
     // Other keys
     public static final String OUTPUT_PATH = "blur_filter_outputs";
     public static final String KEY_IMAGE_URI = "KEY_IMAGE_URI";
     public static final String NOTIFICATION_MSG = "KEY_IMAGE_URI";
     public static final long DELAY_TIME_MILLIS = 3000;
+
     // The name of the notification work
     static final String NOTIFICATION_WORK_NAME = "notification_manipulation_work";
     static final String TAG_OUTPUT = "OUTPUT";

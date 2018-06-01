@@ -7,14 +7,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkContinuation;
 import androidx.work.WorkManager;
 import androidx.work.WorkStatus;
@@ -30,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private OneTimeWorkRequest notificationWork;
     private Constraints constraints;
     private OneTimeWorkRequest notificationWork2;
-    private OneTimeWorkRequest notificationWorkSingle;
+    private PeriodicWorkRequest notificationWorkSingle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Observer for the Activity
+     * @param id Work Request id
+     */
     private void setObserver(UUID id) {
 
         mWorkManager.getStatusById(id).observe(this, new Observer<WorkStatus>() {
@@ -111,6 +118,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method to create chain of Work
+     * Method contains two simple Work with input data
+     */
     void createContinuationWork() {
 
         OneTimeWorkRequest.Builder notificationWorkBuilder =
@@ -150,17 +161,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /***
+     * Method to create Periodic Work
+     * Minimum  Time interval is 900000
+     */
     private void createWork() {
-        OneTimeWorkRequest.Builder notificationWorkBuilder =
-                new OneTimeWorkRequest.Builder(NotificationWorker.class)
+        PeriodicWorkRequest.Builder notificationWorkBuilder =
+                new PeriodicWorkRequest.Builder(NotificationWorker.class,900000,TimeUnit.SECONDS)
                         .setConstraints(getConstraint());
 
-        notificationWorkBuilder.setInputData(createInputData("One Time Work Request"));
+        notificationWorkBuilder.setInputData(createInputData("Periodic Work Request"));
         notificationWorkSingle = notificationWorkBuilder.build();
         mWorkManager.enqueue(notificationWorkSingle);
         setObserver(notificationWorkSingle.getId());
     }
 
+    /**
+     * Method to create Data
+     * @param msg String for notification
+     * @return Data
+     */
     private Data createInputData(String msg) {
         return new Data.Builder().putString(NOTIFICATION_MSG, msg).build();
     }
@@ -173,9 +193,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to Produce Constraint
-     *
-     * @return
+     * Method to Create Constraint
+     * @return Constraints
      */
     public Constraints getConstraint() {
         if (constraints == null)

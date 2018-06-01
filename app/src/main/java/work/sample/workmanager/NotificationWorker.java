@@ -7,6 +7,9 @@ import androidx.work.Worker;
 
 import static work.sample.workmanager.Constants.NOTIFICATION_MSG;
 
+/**
+ * Worker Class that contains Work Logic
+ */
 public class NotificationWorker extends Worker {
     @NonNull
     @Override
