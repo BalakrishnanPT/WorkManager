@@ -163,11 +163,11 @@ public class MainActivity extends AppCompatActivity {
 
     /***
      * Method to create Periodic Work
-     * Minimum  Time interval is 900000
+     * Minimum  Time interval is 900000 milli seconds
      */
     private void createWork() {
         PeriodicWorkRequest.Builder notificationWorkBuilder =
-                new PeriodicWorkRequest.Builder(NotificationWorker.class,900000,TimeUnit.SECONDS)
+                new PeriodicWorkRequest.Builder(NotificationWorker.class,900000,TimeUnit.MILLISECONDS)
                         .setConstraints(getConstraint());
 
         notificationWorkBuilder.setInputData(createInputData("Periodic Work Request"));
