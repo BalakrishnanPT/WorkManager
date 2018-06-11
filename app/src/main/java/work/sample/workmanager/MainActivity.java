@@ -2,12 +2,16 @@ package work.sample.workmanager;
 
 import android.arch.lifecycle.Observer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import java.time.Duration;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +30,8 @@ import static work.sample.workmanager.Constants.NOTIFICATION_MSG;
 import static work.sample.workmanager.Constants.NOTIFICATION_WORK_NAME;
 
 public class MainActivity extends AppCompatActivity {
-
+    public static final int MSG_COLOR_START = 2;
+    private static MainActivity act;
     private WorkManager mWorkManager;
     private TextView status;
     private WorkContinuation continuation;
@@ -34,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private Constraints constraints;
     private OneTimeWorkRequest notificationWork2;
     private PeriodicWorkRequest notificationWorkSingle;
+    public  static IncomingMessageHandler mHandler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
 
         mWorkManager = WorkManager.getInstance();
         status = findViewById(R.id.status);
+
+        mHandler = new IncomingMessageHandler(this);
+
+        act = this;
 
         findViewById(R.id.oneTimeRequest).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,22 +76,23 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.cancelcontinuationRequest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (notificationWork != null)cancelWork(notificationWork.getId());
-                if (notificationWork2 != null)cancelWork(notificationWork2.getId());
+                if (notificationWork != null) cancelWork(notificationWork.getId());
+                if (notificationWork2 != null) cancelWork(notificationWork2.getId());
             }
         });
         findViewById(R.id.cancelAll).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (notificationWorkSingle != null) cancelWork(notificationWorkSingle.getId());
-                if (notificationWork != null)cancelWork(notificationWork.getId());
-                if (notificationWork2 != null)cancelWork(notificationWork2.getId());
+                if (notificationWork != null) cancelWork(notificationWork.getId());
+                if (notificationWork2 != null) cancelWork(notificationWork2.getId());
             }
         });
     }
 
     /**
      * Observer for the Activity
+     *
      * @param id Work Request id
      */
     private void setObserver(UUID id) {
@@ -138,9 +150,10 @@ public class MainActivity extends AppCompatActivity {
         notificationWorkBuilder2.setInputData(createInputData("continuation work 2"));
         notificationWork2 = notificationWorkBuilder2.build();
 
+
 //        Adding notification Work 1
         continuation = mWorkManager
-                .beginUniqueWork(NOTIFICATION_WORK_NAME,ExistingWorkPolicy.KEEP,notificationWork);
+                .beginUniqueWork(NOTIFICATION_WORK_NAME, ExistingWorkPolicy.KEEP, notificationWork);
 
 //        Adding notification Work 2
         continuation.then(notificationWork2).enqueue();
@@ -167,9 +180,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void createWork() {
         PeriodicWorkRequest.Builder notificationWorkBuilder =
-                new PeriodicWorkRequest.Builder(NotificationWorker.class,900000,TimeUnit.MILLISECONDS)
+                new PeriodicWorkRequest.Builder(NotificationWorker.class, 900000, TimeUnit.MILLISECONDS)
                         .setConstraints(getConstraint());
-
         notificationWorkBuilder.setInputData(createInputData("Periodic Work Request"));
         notificationWorkSingle = notificationWorkBuilder.build();
         mWorkManager.enqueue(notificationWorkSingle);
@@ -178,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Method to create Data
+     *
      * @param msg String for notification
      * @return Data
      */
@@ -194,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Method to Create Constraint
+     *
      * @return Constraints
      */
     public Constraints getConstraint() {
@@ -206,4 +220,42 @@ public class MainActivity extends AppCompatActivity {
                     .build();
         return constraints;
     }
+
+
+    protected static class IncomingMessageHandler extends Handler {
+
+        // Prevent possible leaks with a weak reference.
+        private WeakReference<MainActivity> mActivity;
+        private String TAG ="IncomingMessageHandler";
+
+        IncomingMessageHandler(MainActivity activity) {
+            super(/* default looper */);
+            this.mActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity mainActivity = mActivity.get();
+            if (mainActivity == null) {
+                // Activity is no longer available, exit.
+                return;
+            }
+
+            switch (msg.what) {
+                case 1:
+                    try {
+                        Log.d(TAG, "handleMessage: " + msg.obj.toString());
+//                        m = obtainMessage(1);
+//                        sendMessageDelayed(m, 10);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+
+    }
 }
+
+
